@@ -47,9 +47,9 @@ public class TransactionController {
     }
 
     @GetMapping("/transaction/history")
-    public ResponseEntity<?> getBalance(@RequestHeader("Authorization") String token, @RequestParam(name = "offset", defaultValue = "0") int offset,  @RequestParam(name = "limit", defaultValue = "0") int limit) {
+    public ResponseEntity<?> getBalance(@RequestHeader("Authorization") String token, @RequestParam(name = "limit", defaultValue = "0") int limit) {
         try {
-            return ResponseEntity.ok(transactionService.historyTransaction(token, offset, limit));
+            return ResponseEntity.ok(transactionService.historyTransaction(token, limit));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.ok(new CommonResponse<>(500, ex.getMessage(), null));

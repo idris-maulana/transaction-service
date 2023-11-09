@@ -35,7 +35,7 @@ public class TransactionService {
     @Autowired
     ServiceRepository serviceRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CommonResponse<?> getBalance(String token) {
         User user = jwtService.verifyToken(token);
         return new CommonResponse(0, "Get Balance Berhasil", Map.of("balance", user.getBalance()));
@@ -81,21 +81,21 @@ public class TransactionService {
             history.setInvoiceNumber("INV" + new Date().getTime() + "-" + StringHelper.generateSandString(10));
             historyRepository.save(history);
 
-            return new CommonResponse<>(0, "Transaksi berhasil", history);
+            return new CommonResponse<>(0, "Transaksi berhasil", new HistoryTransactionResponse(history.getInvoiceNumber(), history.getTransactionType(), history.getDescription(), history.getTotalAmount(), history.getCreatedOn()));
         }
         return new CommonResponse<>(102, "Service ataus Layanan tidak ditemukan", null);
     }
 
-    @Transactional(readOnly = true)
-    public CommonResponse<?> historyTransaction(String token, Integer offset, Integer limit) {
+    @Transactional
+    public CommonResponse<?> historyTransaction(String token, Integer limit) {
         User user = jwtService.verifyToken(token);
 
-        Page<History> historiesPage = historyRepository.getHistoryTransactionByUserId(user.getId(), limit == 0 ? PageRequest.of(offset, Integer.MAX_VALUE) : PageRequest.of(offset, limit));
+        Page<History> historiesPage = historyRepository.getHistoryTransactionByUserId(user.getId(), limit <= 0 ? PageRequest.of(0, Integer.MAX_VALUE) : PageRequest.of(0, limit));
         List<HistoryTransactionResponse> transactionResponses = new ArrayList<>();
         historiesPage.forEach(hisPage -> {
             transactionResponses.add(new HistoryTransactionResponse(hisPage.getInvoiceNumber(), hisPage.getTransactionType(), hisPage.getDescription(), hisPage.getTotalAmount(), hisPage.getCreatedOn()));
         });
-        return new CommonResponse<>(0, "Get History Berhasil", Map.of("offset", historiesPage.getTotalPages(), "limit", limit, "records", transactionResponses));
+        return new CommonResponse<>(0, "Get History Berhasil", Map.of("offset", historiesPage.getTotalElements() - historiesPage.getNumberOfElements(), "limit", limit, "records", transactionResponses));
     }
 
 }

@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 
@@ -19,6 +20,7 @@ public class JwtService {
     @Autowired
     UserRepository userRepository;
 
+    @Transactional
     public User verifyToken(String token) {
         try {
             SecretKey key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes());

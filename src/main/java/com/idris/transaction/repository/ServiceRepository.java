@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
-    @Query("SELECT s FROM Service WHERE s.serviceCode = ?1")
+    @Query("SELECT s FROM Service s WHERE s.serviceCode = ?1")
     Optional<Service> getServiceByCode(String serviceCode);
 }
